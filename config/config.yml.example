@@ -1,0 +1,10 @@
+self_id: 12345 #机器人QQ号
+prefix: / #命令前缀
+log:
+  level: TRACE #日志等级
+web:
+  host: 0.0.0.0 #Web服务监听地址
+  port: 3000 #Web服务监听端口
+onebot:
+  url: http://127.0.0.1:5700 #消息上报地址
+
