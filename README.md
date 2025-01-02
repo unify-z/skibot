@@ -3,7 +3,7 @@
 > [!WARNING]
 > To run this project, please make sure your node version >= 20.
 > This project is just an open-source framework that I am using; it may not meet everyone's needs.
-## Run
+## ⚙️ Run
 ### by source code
 
 ```
@@ -19,10 +19,10 @@ unzip windows-amd64.zip
 cd windows-amd64
 ./node ./dist/index.js
 ```
-## 📖License
+## 📖 License
 The project is open-sourced under the Apache-2.0 license.
 
-## 🔌Plugins
+## 🔌 Plugins
 > [!TIP]
 > [Plugin Template](https://gitlab.com/skibot-official-plugins/template)(GitLab)
 
