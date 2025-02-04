@@ -1,7 +1,7 @@
 import express from 'express';
 import routers from './routers/message.js'; 
-import { Bot } from './bot/bot.js';
-import { PrivateMessageEvent, BotMessageEvent, GroupMessageEvent } from './bot/events.js';
+import { Bot,Handler } from './bot/bot.js';
+import { BotEvent, BotMessageEvent } from './bot/events.js';
 import  config  from './bot/config.js';
 import {logger} from './bot/log.js'
 import { Plugin } from './bot/plugin.js';
@@ -24,16 +24,16 @@ function initialize(){
   plugin.load_plugins()
 }
 
-bot.on('message', async(event: BotMessageEvent,handler:any,reply_msg:Message) => {
+bot.on('message', async(event: BotMessageEvent,handler:Handler,reply_msg:Message) => {
   logger.info(event.toString())
 });
-bot.on('meta_event',(event: any,handler:any,reply_msg:Message)=>{
+bot.on('meta_event',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
   logger.info(event.toString())
 })
-bot.on('request',(event: any,handler:any,reply_msg:Message)=>{
+bot.on('request',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
   logger.info(event.toString())
 })
-bot.on('notice',(event: any,handler:any,reply_msg:Message)=>{
+bot.on('notice',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
   logger.info(event.toString())
 })
 initialize();
