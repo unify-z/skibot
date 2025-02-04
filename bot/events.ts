@@ -388,12 +388,13 @@ const eventConstructors: { [key: string]: any } = {
     "meta_event.lifecycle.disconnect": BotDisconnectLifeCycleMetaEvent,
     "meta_event.heartbeat": BotHeartBeatMetaEvent,
 };
-
 export function matchEvents(eventData: any): void {
     const postType = eventData.post_type;
     const messageType = eventData.message_type;
     const subType = eventData.sub_type;
-    const action = eventData.action;
+    const noticeType = eventData.notice_type;
+    const requestType = eventData.request_type;
+    const metaEventType = eventData.meta_event_type;
 
     let key: string;
     switch (postType) {
@@ -401,24 +402,16 @@ export function matchEvents(eventData: any): void {
             key = `${postType}.${messageType}.${subType}`;
             break;
         case "notice":
-            key = action ? `${postType}.${subType}.${action}` : `${postType}.${subType}`;
+            key = `${postType}.${noticeType}.${subType || ''}`.replace(/\.$/, '');
             break;
         case "request":
-            key = `${postType}.${eventData.request_type}.${subType || ''}`.replace(/\.$/, '');
+            key = `${postType}.${requestType}.${subType || ''}`.replace(/\.$/, '');
             break;
         case "meta_event":
-            const metaEventType = eventData.meta_event_type;
-            switch (metaEventType) {
-                case 'heartbeat':
-                    key = `${postType}.${metaEventType}`;
-                    break;
-                case 'lifecycle':
-                    key = `${postType}.${subType}`;
-                    break;
-                default:
-            }
+            key = `${postType}.${metaEventType}.${subType || ''}`.replace(/\.$/, '');
             break;
         default:
+            return;
     }
 
     const EventConstructor = eventConstructors[key];
@@ -460,7 +453,6 @@ export function matchEvents(eventData: any): void {
     }
 }
 
-    
 
 
 function formatEventData(data: any): any {
