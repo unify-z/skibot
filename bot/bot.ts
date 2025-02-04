@@ -86,7 +86,7 @@ export class Bot {
 
         const handler = (event: any,handler:any,reply_msg:any) => {
             if (event.raw_message.startsWith(config.get("prefix") + command)) {
-                const args = event.raw_message.split(" ")[1];
+                const args = event.raw_message.split(" ").slice(1);
                 callback(args,handler,reply_msg);
             }
         };

@@ -22,7 +22,7 @@ export class Plugin {
                     plugin_config = config.get(`plugin.${file}`);
                 }
                 //logger.info(plugin_json)
-                if (plugin_json.enabled === true){
+                if (plugin_json.config.enabled === true){
                     logger.info(`load plugin ${file}`)
                     plugin_main.init_config(plugin_config)
                     plugin_main.init(get_bot(config.get('self_id')))

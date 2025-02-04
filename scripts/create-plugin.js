@@ -60,6 +60,9 @@ async function createPlugin(plugindata) {
 }
 
 async function main() {
+    if (fs.existsSync('./plugins') == false) {
+        fs.mkdirSync('./plugins');
+    }
     const plugindata = await getUserInput();
     await createPlugin(plugindata);
 }

@@ -7,9 +7,9 @@ import {logger} from './bot/log.js'
 import { Plugin } from './bot/plugin.js';
 import { Message,MessageSegment } from './bot/messages.js';
 const app = express();
-const port = 3000;
+const port = config.get('web.port');
 const bot = new Bot(config.get('self_id'));
-
+const host = config.get('web.host');
 
 function initialize(){
   app.use(express.json());
@@ -17,8 +17,8 @@ function initialize(){
 
   app.use('/api', routers); 
 
-  app.listen(port, () => {
-    logger.info(`Server is running on http://localhost:${port}`);
+  app.listen(port, host,() => {
+    logger.info(`Server is running on http://${config.get('web.host')}:${port}`);
   });
   const plugin = new Plugin('./plugins')
   plugin.load_plugins()
