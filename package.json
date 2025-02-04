@@ -1,7 +1,7 @@
 {
   "name": "skibot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "rimraf dist && npx tsc-watch --onSuccess  \"node --enable-source-maps  dist/index.js \"",
