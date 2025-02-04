@@ -388,7 +388,7 @@ const eventConstructors: { [key: string]: any } = {
     "meta_event.lifecycle.disconnect": BotDisconnectLifeCycleMetaEvent,
     "meta_event.heartbeat": BotHeartBeatMetaEvent,
 };
-
+// match events
 export function matchEvents(eventData: any): void {
     const postType = eventData.post_type;
     const messageType = eventData.message_type;
