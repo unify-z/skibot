@@ -27,7 +27,7 @@ class BaseMessage {
         }
     }
 
-    json(): { type: string; data: Data } {
+    json(){
         return {
             type: this.type,
             data: this.data
@@ -44,7 +44,7 @@ export class Message extends Array<BaseMessage> {
         return this.map(v => v.cq()).join('');
     }
 
-    append(object: any): this {
+    addMessage(object: any): this {
         if (object instanceof Message) {
             this.union(object);
             return this;
@@ -53,14 +53,14 @@ export class Message extends Array<BaseMessage> {
         return this;
     }
 
-    appendMessage(type: string, data: Data): this {
-        return this.append(new BaseMessage(type, data));
+    pushMessage(type: string, data: Data): this {
+        return this.addMessage(new BaseMessage(type, data));
     }
 
     union(...s: Message[]): this {
         for (const msg of s) {
             for (const baseMessage of msg) {
-                this.append(baseMessage);
+                this.addMessage(baseMessage);
             }
         }
         return this;
@@ -82,21 +82,21 @@ export class MessageSegment {
     [key: string]: any;
 
     static text(text: string): Message {
-        return Message.build().appendMessage("text", { text });
+        return Message.build().pushMessage("text", { text });
     }
 
     static at(qq: number): Message {
-        return Message.build().appendMessage("at", { qq });
+        return Message.build().pushMessage("at", { qq });
     }
 
     static reply(id: number): Message {
-        return Message.build().appendMessage("reply", { reply: id });
+        return Message.build().pushMessage("reply", { id: id.toString() });
     }
 
     static fromJson(msg: { type: string; data: Data }[]): Message {
         const array = Message.build();
         for (const message of msg) {
-            array.appendMessage(message.type, message.data);
+            array.pushMessage(message.type, message.data);
         }
         return array;
     }
