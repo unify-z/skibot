@@ -3,7 +3,8 @@ import { BotEvent, BotMessageEvent, messageevent, metaevent, requestevent, notic
 import { Message } from "./messages.js";
 import  config  from "./config.js";
 import logger from './log.js';
-async function send_request(path: string, body: object) {
+import { PrivateMessageEvent } from './events.js';
+async function call_api(path: string, body: object) {
     const res = await axios.post(`${config.get('onebot.url')}${path}`, body);
     return res.data;
 }
@@ -18,13 +19,13 @@ export function get_bot(id: number): Bot {
 }
 export class SendMessage {
     static async send_group_msg(group_id: number, message: any) {
-        await send_request(`/send_group_msg`,{
+        await call_api(`/send_group_msg`,{
             'group_id': group_id,
             'message': message.json()
         })
     }
     static async send_private_msg(user_id: number, message: any) {
-        await send_request(`/send_private_msg`,{
+        await call_api(`/send_private_msg`,{
             'user_id': user_id,
            'message': message.json()
         })
@@ -81,13 +82,13 @@ export class Bot {
         this.eventQueue.push(event);
     }
 
-    command(command: string, description: string, callback: (arg: string,handler:Handler,reply_msg:Message) => void) {
+    command(command: string, description: string, callback: (arg: string,handler:Handler,reply_msg:Message,event: BotMessageEvent) => void) {
         this.resiger_command(command, description);
 
         const handler = (event: any,handler:any,reply_msg:any) => {
             if (event.raw_message.startsWith(config.get("prefix") + command)) {
                 const args = event.raw_message.split(" ").slice(1);
-                callback(args,handler,reply_msg);
+                callback(args,handler,reply_msg,event);
             }
         };
 
@@ -165,6 +166,10 @@ export class Handler{
         if (this._event instanceof GroupMessageEvent){
             this._send = SendMessage.send_group_msg;
             this._send(this._event.group_id, message);
+        }
+        if (this._event instanceof PrivateMessageEvent){
+            this._send = SendMessage.send_private_msg;
+            this._send(this._event.user_id, message);
         }
     }
 }
