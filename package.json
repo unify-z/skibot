@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "rimraf dist && npx tsc-watch --onSuccess  \"node --enable-source-maps  dist/index.js \"",
-    "build": "npx tsc",
-    "start": "npx tsc && node dist/index.js --es-module-specifier-resolution=node",
+    "build": "rimraf dist && npx tsc",
+    "start": "rimraf dist && npx tsc && node dist/index.js --es-module-specifier-resolution=node",
     "create-plugin": "node scripts/create-plugin.js"
   },
   "author": "unify-z <i@itify.top>",
@@ -20,6 +20,7 @@
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",
     "readline": "^1.3.0",
+    "rimraf": "^6.0.1",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
