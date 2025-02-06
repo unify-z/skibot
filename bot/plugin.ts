@@ -19,13 +19,12 @@ export class Plugin {
                 let plugin_config = config.get(`plugin.${file}`);
                 if (plugin_config === null){
                     config.set(`plugin.${file}`, plugin_except_config);
-                    plugin_config = config.get(`plugin.${file}`);
+                    plugin_config = config.get(`plugin.${file}`,null)
                 }
-                //logger.info(plugin_json)
-                if (plugin_json.config.enabled === true){
+                if (plugin_config.enabled === true){
                     logger.info(`load plugin ${file}`)
                     plugin_main.init_config(plugin_config)
-                    plugin_main.init(get_bot(config.get('self_id')))
+                    await plugin_main.init(get_bot(config.get('self_id')))
             }}
             catch(e){
                 logger.error(`load plugin ${file} error: ${e}`)
