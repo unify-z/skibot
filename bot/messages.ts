@@ -43,7 +43,6 @@ export class Message extends Array<BaseMessage> {
     cq(): string {
         return this.map(v => v.cq()).join('');
     }
-
     addMessage(object: any): this {
         if (object instanceof Message) {
             this.union(object);

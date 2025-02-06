@@ -4,8 +4,10 @@ import { get_bot } from './bot.js';
 import config from './config.js';
 export class Plugin {
     private _plugin_dir: string;
+    private plugins: Array<any>;
     constructor(_plugin_dir: string){
         this._plugin_dir = _plugin_dir;
+        this.plugins = [];
     }
     async load_plugins(){
         const files = fs.readdirSync(this._plugin_dir);
@@ -23,6 +25,7 @@ export class Plugin {
                 }
                 if (plugin_config.enabled === true){
                     logger.info(`load plugin ${file}`)
+                    this.plugins.push(plugin_json.name)
                     plugin_main.init_config(plugin_config)
                     await plugin_main.init(get_bot(config.get('self_id')))
             }}
@@ -30,12 +33,5 @@ export class Plugin {
                 logger.error(`load plugin ${file} error: ${e}`)
             }}
 
-    }
-    async unload_plugin(plugin_name: string){
-
-        
-    }
-    async reload_plugins(){
-        
     }
 }
