@@ -16,6 +16,7 @@
     "@tsconfig/node20": "^20.1.4",
     "axios": "^1.7.9",
     "express": "^4.21.2",
+    "express-async-errors": "^3.1.1",
     "js-yaml": "^4.1.0",
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",
