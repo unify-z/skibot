@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { BotEvent, BotMessageEvent, messageevent, metaevent, requestevent, noticeevent, GroupMessageEvent } from "./events.js";
-import { Message } from "./messages.js";
+import { Message, MessageSegment } from "./messages.js";
 import  config  from "./config.js";
-import logger from './log.js';
 import { PrivateMessageEvent } from './events.js';
+import logger from './log.js';
 async function call_api(path: string, body: object) {
     const res = await axios.post(`${config.get('onebot.url')}${path}`, body);
     return res.data;
@@ -85,10 +85,16 @@ export class Bot {
     command(command: string, description: string, callback: (arg: string,handler:Handler,reply_msg:Message,event: BotMessageEvent) => void) {
         this.resiger_command(command, description);
 
-        const handler = (event: any,handler:any,reply_msg:any) => {
+        const handler = async (event: any,handler:any,reply_msg:any) => {
             if (event.raw_message.startsWith(config.get("prefix") + command)) {
                 const args = event.raw_message.split(" ").slice(1);
-                callback(args,handler,reply_msg,event);
+                try{
+                await callback(args,handler,reply_msg,event);
+                return
+                }
+                catch(e){
+                    logger.error(`error when handling command ${command}, ${e}`)
+                    return;                }
             }
         };
 
@@ -99,26 +105,23 @@ export class Bot {
         return new Promise<void>((resolve, reject) => {
             if (this.eventHandlers[eventName]) {
                 const handlers = this.eventHandlers[eventName];
-                //console.time(`Invoke ${eventName} callbacks`)
-                Promise.all(handlers.map(handler => handler(event, new Handler(event), new Message())))
+                Promise.all(handlers.map(async handler => await handler(event, new Handler(event), new Message())))
                     .then(() => resolve())
                     .catch((error) => {
                         console.error(`Error in handler for event ${eventName}:`, error);
-                        reject(error);
                     });
-                //console.timeEnd(`Invoke ${eventName} callbacks`)
             } else {
                 resolve();
             }
         });
     }
-
     private startEventLoop() {
         const eventHandlers = new Map<string, (event: any) => void>([
             ['message', async (event) => {
                 if (messageevent != null && messageevent !== this.messageevent) {
-                    await this.invokeCallbacks(event, messageevent);
                     this.messageevent = messageevent;
+                    await this.invokeCallbacks(event, messageevent);
+                    
                 }
             }],
             ['notice', async (event) => {

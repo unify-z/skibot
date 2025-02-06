@@ -23,7 +23,7 @@ function initialize(){
   });
   const plugin = new Plugin('./plugins')
   plugin.load_plugins()
-}
+
 
 bot.on('message', async(event: BotMessageEvent,handler:Handler,reply_msg:Message) => {
   logger.info(event.toString())
@@ -54,4 +54,6 @@ bot.command('help','获取帮助信息',(args,handler: Handler,msg: Message,even
   handler.finish(msg)
 
 })
+}
+
 initialize();
