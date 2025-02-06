@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec \"npx tsc && node --enable-source-maps dist/index.js\"",
     "build": "npx tsc",
-    "start": "npx tsc && nodemon --exec node dist/index.js --es-module-specifier-resolution=node",
+    "start": "npx tsc && nodemon --exec node dist/index.js",
     "create-plugin": "node scripts/create-plugin.js"
   },
   "author": "unify-z <i@itify.top>",
@@ -35,7 +35,7 @@
       "config/",
       "plugins/"
     ],
-    "ext": "js ts yml",
+    "ext": "ts yml json",
     "ignore": [
       "dist/"
     ]

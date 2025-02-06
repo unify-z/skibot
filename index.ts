@@ -55,5 +55,19 @@ bot.command('help','获取帮助信息',(args,handler: Handler,msg: Message,even
 
 })
 }
+function onStop(signal: string){
+  const files = fs.readdirSync('./plugins')
+  for (const file of files){
+    try{
+    fs.unlinkSync(`./plugins/${file}/index.js`)
+    }
+    catch(e){
+    }
+  }
+  console.log(`${signal} received. Shutting down...`)
+  process.exit(0);
 
+}
 initialize();
+process.on("SIGINT", onStop);
+process.on("SIGTERM", onStop);
