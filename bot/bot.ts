@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BotEvent, BotMessageEvent, messageevent, metaevent, requestevent, noticeevent, GroupMessageEvent } from "./events.js";
+import { BotEvent, BotMessageEvent, messageevent, metaevent, requestevent, noticeevent, RequestEvent,NoticeEvent,MetaEvent, GroupMessageEvent, } from "./events.js";
 import { Message, MessageSegment } from "./messages.js";
 import  config  from "./config.js";
 import { PrivateMessageEvent } from './events.js';
@@ -44,18 +44,18 @@ export class SendMessage {
 }
 export class Bot {
     public self_id: number;
-    private messageevent: any;
-    private noticeevent: any;
-    private requestevent: any;
-    private metaevent: any;
+    private messageevent: BotMessageEvent;
+    private noticeevent: NoticeEvent;
+    private requestevent: RequestEvent;
+    private metaevent: MetaEvent;
     private eventHandlers: { [eventName: string]: Function[] } = {};
     private eventQueue = [];
     public commands: Array<any>;
     constructor(self_id: number) {
-        this.messageevent = "";
-        this.noticeevent = "";
-        this.requestevent = "";
-        this.metaevent = "";
+        this.messageevent = null;
+        this.noticeevent = null;
+        this.requestevent = null;
+        this.metaevent = null;
         this.self_id = self_id;
         this.startEventLoop();
         this.commands = [];
