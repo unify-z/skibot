@@ -87,7 +87,9 @@ export class Bot {
         this.resiger_command(command, description);
 
         const handler = async (event: any,handler:any,reply_msg:any) => {
-            if (event.raw_message.startsWith(config.get("prefix") + command)) {
+            const prefix = config.get("prefix");
+            const regex = new RegExp(`^${prefix}${command}`);
+            if (regex.test(event.raw_message)) {
                 const args = event.raw_message.split(" ").slice(1);
                 try{
                 await callback(args,handler,reply_msg,event);
