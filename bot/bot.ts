@@ -18,13 +18,13 @@ export function get_bot(id: number): Bot {
     return BOTS[id];
 }
 export class SendMessage {
-    static async send_group_msg(group_id: number, message: any) {
+    static async send_group_msg(group_id: number, message: Message) {
         await call_api(`/send_group_msg`,{
             'group_id': group_id,
             'message': message.json()
         })
     }
-    static async send_private_msg(user_id: number, message: any) {
+    static async send_private_msg(user_id: number, message: Message) {
         await call_api(`/send_private_msg`,{
             'user_id': user_id,
            'message': message.json()
