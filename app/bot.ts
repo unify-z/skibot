@@ -101,7 +101,7 @@ export class Bot {
                 }
                 catch(e){
                     logger.error(`error when handling command ${command}, ${e}`)
-                    //await this.handleError(e, event);
+                    await this.handleError(e, event);
                     return;                }
             }
         };
@@ -111,7 +111,7 @@ export class Bot {
     private async handleError(error: Error,event: BotEvent){
         const message = new Message()
         const handler = new Handler(event)
-        message.addMessage(MessageSegment.text(`在响应消息事件时出错: ${error}`))
+        message.addMessage(MessageSegment.text(`在响应 ${event.constructor.name} 事件时出错: ${error}`))
         handler.finish(message)
     }
     private invokeCallbacks(eventName: string, event: BotEvent) {
@@ -122,7 +122,7 @@ export class Bot {
                     .then(() => resolve())
                     .catch(async (error) => {
                         console.error(`Error in handler for event ${eventName}:`, error);
-                        //await this.handleError(error, event);
+                        await this.handleError(error, event);
                         return;
                     });
             } else {

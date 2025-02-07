@@ -1,3 +1,4 @@
+import { BotMessageEvent } from "./events.js";
 import { Database } from "./JsonDBHelper.js";
 
 class Counter{
@@ -25,14 +26,14 @@ class Counter{
         return
 
     }
-    async add_hits(){
-        const get_hits = this._db.get('hits')
-        if (get_hits){
-            get_hits.push(Date.now())
-            this._db.updateOne('hits',get_hits)
+    async add_messages(event: BotMessageEvent){
+        const get_messages = this._db.get('messages')
+        if (get_messages){
+            get_messages.push(JSON.stringify(event))
+            this._db.updateOne('messages',get_messages)
             return
         }else{
-            this._db.set('hits',[Date.now()])
+            this._db.set('messages',[Date.now()])
             return
         }
     }

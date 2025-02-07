@@ -35,7 +35,7 @@ function initialize(){
 
   bot.on('message', async (event: BotMessageEvent) => {
     logger.info(JSON.stringify(event));
-    await counter.add_hits()
+    counter.add_messages(event)
     if (event instanceof GroupMessageEvent){
       await counter.add_group(event.group_id)
     }
@@ -86,29 +86,29 @@ function onStop(signal: string){
 function updateCountHistory(){
   const groups = database.get('groupList').length
   const users = database.get('userList').length
-  const hits = database.get('hits').length
+  const messages = database.get('messages').length
   const groupListLengthHistory = database.get('groupListLengthHistory')
   const userListLengthHistory = database.get('userListLengthHistory')
-  const hitsLengthHistory = database.get('hitsLengthHistory')
+  const messagesLengthHistory = database.get('messagesLengthHistory')
   groupListLengthHistory.push(groups)
   userListLengthHistory.push(users)
-  hitsLengthHistory.push(hits)
+  messagesLengthHistory.push(messages)
   database.updateOne('groupListLengthHistory',groupListLengthHistory)
   database.updateOne('userListLengthHistory',userListLengthHistory)
-  database.updateOne('hitsLengthHistory',hitsLengthHistory)
+  database.updateOne('messagesLengthHistory',messagesLengthHistory)
 }
 function cleanCount(){
   database.updateOne('groupList',[])
   database.updateOne('userList',[])
-  database.updateOne('hits',[])
+  database.updateOne('messages',[])
   if (database.get('groupListLengthHistory').length >= 30){
     database.updateOne('groupListLengthHistory',[])
   }
   if (database.get('userListLengthHistory').length >= 30){
     database.updateOne('userListLengthHistory',[])
   }
-  if (database.get('hitsLengthHistory').length >= 30){
-    database.updateOne('hitsLengthHistory',[])
+  if (database.get('messagesLengthHistory').length >= 30){
+    database.updateOne('messagesLengthHistory',[])
   }
 }
 schedule.scheduleJob('0 0 * * *', updateCountHistory);

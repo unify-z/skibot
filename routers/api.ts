@@ -35,12 +35,12 @@ ApiRoutes.get('/status', async (req, res) => {
     "version": "1.0.0",
     "plugins": plugin.get_load_plugins(),
     "today": {
-      "hits": database.get('hits').length,
+      "messages": database.get('messages').length,
       "users": database.get('userList').length,
       "groups": database.get('groupList').length
     },
     "daily": {
-      "hits": database.get('hitsLengthHistory'),
+      "messages": database.get('messagesLengthHistory'),
       "groups": database.get('groupListLengthHistory'),
       "users": database.get('userListLengthHistory')
     }
