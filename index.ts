@@ -3,7 +3,7 @@ import routers from './routers/message.js';
 import { Bot,Handler } from './bot/bot.js';
 import { BotEvent, BotMessageEvent } from './bot/events.js';
 import  config  from './bot/config.js';
-import {logger} from './bot/log.js'
+import logger from './bot/log.js'
 import { Plugin } from './bot/plugin.js';
 import { Message,MessageSegment } from './bot/messages.js';
 const app = express();

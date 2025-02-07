@@ -33,6 +33,7 @@ interface GroupUploadFile {
 
 import { Message } from "./messages.js";
 import { get_bot,SendMessage } from "./bot.js"
+import logger from "./log.js";
 export class BotEvent {
     time: number;
     self_id: number;
@@ -388,13 +389,14 @@ const eventConstructors: { [key: string]: any } = {
     "meta_event.lifecycle.disconnect": BotDisconnectLifeCycleMetaEvent,
     "meta_event.heartbeat": BotHeartBeatMetaEvent,
 };
+
 export function matchEvents(eventData: any): void {
     const postType = eventData.post_type;
     const messageType = eventData.message_type;
-    const subType = eventData.sub_type;
-    const noticeType = eventData.notice_type;
-    const requestType = eventData.request_type;
-    const metaEventType = eventData.meta_event_type;
+    const subType = eventData.sub_type || '';
+    const noticeType = eventData.notice_type || '';
+    const requestType = eventData.request_type || '';
+    const metaEventType = eventData.meta_event_type || '';
 
     let key: string;
     switch (postType) {
@@ -402,62 +404,147 @@ export function matchEvents(eventData: any): void {
             key = `${postType}.${messageType}.${subType}`;
             break;
         case "notice":
-            key = `${postType}.${noticeType}.${subType || ''}`.replace(/\.$/, '');
+            key = `${postType}.${noticeType}${subType ? `.${subType}` : ''}`;
             break;
         case "request":
-            key = `${postType}.${requestType}.${subType || ''}`.replace(/\.$/, '');
+            key = `${postType}.${requestType}${subType ? `.${subType}` : ''}`;
             break;
         case "meta_event":
-            key = `${postType}.${metaEventType}.${subType || ''}`.replace(/\.$/, '');
+            key = `${postType}.${metaEventType}${subType ? `.${subType}` : ''}`;
             break;
         default:
             return;
     }
+    logger.trace(key)
 
     const EventConstructor = eventConstructors[key];
-    if (EventConstructor) {
-        const message = formatEventData(eventData.message);
-        const sender = formatEventData(eventData.sender);
-        
-        const constructorArgs = [
-            eventData.time,
-            eventData.self_id,
-        ];
+    if (!EventConstructor) return;
+    const message = JSON.stringify(eventData.message);
+    const sender = JSON.stringify(eventData.sender);
 
-        if (key.startsWith("message.")) {
-            constructorArgs.push(
+    const baseArgs = [eventData.time, eventData.self_id];
+    const eventSpecificArgs: any[] = [];
+
+    switch (key) {
+        case "message.private.friend":
+        case "message.private.group":
+        case "message.private.other":
+            eventSpecificArgs.push(
                 eventData.message_id,
-                message, 
+                message,
+                eventData.raw_message,
+                sender,
+                eventData.user_id
+            );
+            break;
+        case "message.group.normal":
+        case "message.group.notice":
+            eventSpecificArgs.push(
+                eventData.message_id,
+                message,
+                eventData.raw_message,
+                sender,
+                eventData.group_id,
+                eventData.user_id
+            );
+            break;
+        case "message.group.anonymous":
+            eventSpecificArgs.push(
+                eventData.message_id,
+                message,
                 eventData.raw_message,
                 sender,
                 eventData.group_id,
                 eventData.user_id,
                 eventData.anonymous
             );
-        } else if (key.startsWith("notice.")) {
-            constructorArgs.push(
+            break;
+
+        case "notice.group_upload":
+            eventSpecificArgs.push(
+                eventData.group_id,
+                eventData.user_id,
+                eventData.file
+            );
+            break;
+        case "notice.group_admin.set":
+        case "notice.group_admin.unset":
+            eventSpecificArgs.push(
                 eventData.group_id,
                 eventData.user_id
             );
-            if (eventData.file) {
-                constructorArgs.push(eventData.file);
-            }
-        } else if (key.startsWith("request.")) {
-            constructorArgs.push(eventData.group_id, eventData.user_id, eventData.flag, eventData.comment);
-        } else if (key.startsWith("meta_event.")) {
-            constructorArgs.push(formatEventData(eventData.status))
-        }
+            break;
+        case "notice.group_decrease.leave":
+        case "notice.group_decrease.kick":
+        case "notice.group_decrease.kick_me":
+        case "notice.group_increase.approve":
+        case "notice.group_increase.invite":
+            eventSpecificArgs.push(
+                eventData.group_id,
+                eventData.user_id,
+                eventData.operator_id
+            );
+            break;
+        case "notice.group_ban.ban":
+        case "notice.group_ban.lift_ban":
+            eventSpecificArgs.push(
+                eventData.group_id,
+                eventData.user_id,
+                eventData.operator_id,
+                eventData.duration
+            );
+            break;
+        case "notice.friend-recall":
+            eventSpecificArgs.push(
+                eventData.user_id,
+                eventData.message_id,
+                eventData.target_id
+            );
+            break;
+        case "notice.group_recall":
+            eventSpecificArgs.push(
+                eventData.user_id,
+                eventData.message_id,
+                eventData.group_id,
+                eventData.operator_id
+            );
+            break;
 
-        const newEvent = new EventConstructor(...constructorArgs);
-        updateEvent(newEvent);
+
+        case "request.friend":
+            eventSpecificArgs.push(
+                eventData.user_id,
+                eventData.comment,
+                eventData.flag
+            );
+            break;
+        case "request.group.add":
+            eventSpecificArgs.push(
+                eventData.group_id,
+                eventData.user_id,
+                eventData.flag,
+                eventData.comment
+            );
+            break;
+        case "request.group.invite":
+            eventSpecificArgs.push(
+                eventData.group_id,
+                eventData.user_id,
+                eventData.flag
+            );
+            break;
+
+
+        case "meta_event.lifecycle.connect":
+        case "meta_event.lifecycle.disconnect":
+            break;
+        case "meta_event.heartbeat":
+            eventSpecificArgs.push(JSON.stringify(eventData.status));
+            break;
     }
+
+    const constructorArgs = [...baseArgs, ...eventSpecificArgs];
+    const newEvent = new EventConstructor(...constructorArgs);
+    updateEvent(newEvent);
 }
 
-
-
-function formatEventData(data: any): any {
-    if (typeof data === 'object') {
-        return JSON.stringify(data); 
-    }
-    return data;
-}
