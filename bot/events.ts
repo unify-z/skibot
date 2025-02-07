@@ -415,7 +415,7 @@ export function matchEvents(eventData: any): void {
         default:
             return;
     }
-    logger.trace(key)
+    logger.info(key)
 
     const EventConstructor = eventConstructors[key];
     if (!EventConstructor) return;

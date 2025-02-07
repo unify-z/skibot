@@ -180,10 +180,12 @@ export class Handler{
         if (this._event instanceof GroupMessageEvent){
             this._send = SendMessage.send_group_msg;
             this._send(this._event.group_id, message);
+            return;
         }
         if (this._event instanceof PrivateMessageEvent){
             this._send = SendMessage.send_private_msg;
             this._send(this._event.user_id, message);
+            return;
         }
     }
 }
