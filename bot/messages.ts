@@ -85,7 +85,7 @@ export class MessageSegment {
     }
 
     static at(qq: number): Message {
-        return Message.build().pushMessage("at", { qq });
+        return Message.build().pushMessage("at", { qq: qq.toString() });
     }
 
     static reply(id: number): Message {
