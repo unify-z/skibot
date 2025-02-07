@@ -25,18 +25,21 @@ function initialize(){
   plugin.load_plugins()
 
 
-bot.on('message', async(event: BotMessageEvent,handler:Handler,reply_msg:Message) => {
-  logger.info(event.toString())
-});
-bot.on('meta_event',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
-  logger.info(event.toString())
-})
-bot.on('request',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
-  logger.info(event.toString())
-})
-bot.on('notice',(event: BotEvent,handler:Handler,reply_msg:Message)=>{
-  logger.info(event.toString())
-})
+  bot.on('message', async (event: BotMessageEvent) => {
+    logger.info(JSON.stringify(event));
+  });
+  
+  bot.on('meta_event', (event: BotEvent) => {
+    logger.info(JSON.stringify(event));
+  });
+  
+  bot.on('request', (event: BotEvent) => {
+    logger.info(JSON.stringify(event));
+  });
+  
+  bot.on('notice', (event: BotEvent) => {
+    logger.info(JSON.stringify(event));
+  });
 
 bot.command('about','获取关于信息',(args,Handler: Handler,msg: Message)=>{
   msg.addMessage(MessageSegment.text(`SkiBot v${version} \nAuthor: @unify-z \nhttps://github.com/unify-z/skibot`))

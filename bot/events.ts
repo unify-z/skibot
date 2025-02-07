@@ -419,8 +419,8 @@ export function matchEvents(eventData: any): void {
 
     const EventConstructor = eventConstructors[key];
     if (!EventConstructor) return;
-    const message = JSON.stringify(eventData.message);
-    const sender = JSON.stringify(eventData.sender);
+    const message = eventData.message;
+    const sender = eventData.sender;
 
     const baseArgs = [eventData.time, eventData.self_id];
     const eventSpecificArgs: any[] = [];
@@ -539,7 +539,7 @@ export function matchEvents(eventData: any): void {
         case "meta_event.lifecycle.disconnect":
             break;
         case "meta_event.heartbeat":
-            eventSpecificArgs.push(JSON.stringify(eventData.status));
+            eventSpecificArgs.push(eventData.status);
             break;
     }
 
