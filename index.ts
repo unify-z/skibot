@@ -1,31 +1,36 @@
 import express from 'express';
 import msgrouters from './routers/message.js'; 
-import { Bot,Handler } from './bot/bot.js';
-import { BotEvent, BotMessageEvent, GroupMessageEvent } from './bot/events.js';
-import  config  from './bot/config.js';
-import logger from './bot/log.js'
-import plugin, { Plugin } from './bot/plugin.js';
-import { Message,MessageSegment } from './bot/messages.js';
+import { Bot,Handler } from './app/bot.js';
+import { BotEvent, BotMessageEvent, GroupMessageEvent } from './app/events.js';
+import  config  from './app/config.js';
+import logger from './app/log.js'
+import plugin, { Plugin } from './app/plugin.js';
+import { Message,MessageSegment } from './app/messages.js';
 import schedule from 'node-schedule';
+import * as fs from 'fs';
+import counter from './app/counter.js';
+import { database} from './app/counter.js';
+import ApiRoutes from './routers/api.js';
+import jwtHelper from './app/JwtHelper.js';
+import cookieParser from 'cookie-parser';
+import AuthRoutes from './routers/auth.js';
+
 const app = express();
 const port = config.get('web.port');
 const bot = new Bot(config.get('self_id'));
 const host = config.get('web.host');
-import * as fs from 'fs';
-import counter from './bot/counter.js';
-import { database} from './bot/counter.js';
-import ApiRoutes from './routers/api.js';
 const version = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
 function initialize(){
+  plugin.load_plugins() 
+  app.use(cookieParser())
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use('/api',ApiRoutes)
   app.use('/message', msgrouters); 
-
+  app.use('/auth',AuthRoutes);
   app.listen(port, host,() => {
     logger.info(`Server is running on http://${host}:${port}`);
   });
-  plugin.load_plugins()
 
 
   bot.on('message', async (event: BotMessageEvent) => {
@@ -48,11 +53,11 @@ function initialize(){
     logger.info(JSON.stringify(event));
   });
 
-bot.command('about','获取关于信息',(args,Handler: Handler,msg: Message)=>{
+  bot.command('about','获取关于信息',(args,Handler: Handler,msg: Message)=>{
   msg.addMessage(MessageSegment.text(`SkiBot v${version} \nAuthor: @unify-z \nhttps://github.com/unify-z/skibot`))
   Handler.finish(msg)
 })
-bot.command('help','获取帮助信息',(args,handler: Handler,msg: Message,event)=>{
+  bot.command('help','获取帮助信息',(args,handler: Handler,msg: Message,event)=>{
   let help_msg = '当前共有以下可用指令: \n'
   for (const _command of bot.commands){
     const command =  _command.command
@@ -96,6 +101,15 @@ function cleanCount(){
   database.updateOne('groupList',[])
   database.updateOne('userList',[])
   database.updateOne('hits',[])
+  if (database.get('groupListLengthHistory').length >= 30){
+    database.updateOne('groupListLengthHistory',[])
+  }
+  if (database.get('userListLengthHistory').length >= 30){
+    database.updateOne('userListLengthHistory',[])
+  }
+  if (database.get('hitsLengthHistory').length >= 30){
+    database.updateOne('hitsLengthHistory',[])
+  }
 }
 schedule.scheduleJob('0 0 * * *', updateCountHistory);
 schedule.scheduleJob('0 0 * * *', cleanCount);

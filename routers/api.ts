@@ -1,11 +1,34 @@
 import express from 'express';
 const ApiRoutes = express.Router();
-import { database } from '../bot/counter.js';
-import plugin from '../bot/plugin.js';
+import { database } from '../app/counter.js';
+import plugin from '../app/plugin.js';
 import * as fs from 'fs';
-import config from '../bot/config.js';
-import { get_bot } from '../bot/bot.js';
+import config from '../app/config.js';
+import { get_bot } from '../app/bot.js';
+import jwtHelper from '../app/JwtHelper.js';
 await import ('express-async-errors')
+
+ApiRoutes.use((req,res,next)=>{
+    const token = req.cookies['token']
+    if (!token){
+      res.json({
+        "code": 401,
+        "message": "no token found"
+      });
+      return;
+    }
+    const tokenVerifyResult = jwtHelper.verifyToken(token)
+    if (!tokenVerifyResult){
+      res.json({
+        "cord": 401,
+        "message": "token invalid"
+      });
+      return;
+    }
+    next()
+})
+
+
 ApiRoutes.get('/status', async (req, res) => {
   const json_data = {
     "status": "ok",

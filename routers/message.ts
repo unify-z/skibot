@@ -1,5 +1,5 @@
 import express from 'express';
-import { matchEvents } from '../bot/events.js';
+import { matchEvents } from '../app/events.js';
 const msgrouter = express.Router();
 await import ('express-async-errors')
 msgrouter.post('/put', async(req, res) => {
