@@ -53,9 +53,9 @@ async function createPlugin(plugindata) {
     fs.writeFileSync(`./plugins/${plugindata.name}` + '/plugin.json', JSON.stringify(plugin_json, null, 2));
     console.log('正在写入插件模板...');
     
-    const res = await axios.get('https://gitlab.com/skibot-official-plugins/template/-/raw/main/index.js');
+    const res = await axios.get('https://gitlab.com/skibot-official-plugins/template/-/raw/main/index.ts');
     const template = res.data;
-    fs.writeFileSync(`./plugins/${plugindata.name}` + '/index.js', template);
+    fs.writeFileSync(`./plugins/${plugindata.name}` + '/index.ts', template);
     console.log('插件创建成功！');
 }
 
