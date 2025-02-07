@@ -7,7 +7,8 @@
     "dev": "nodemon --exec \"npx tsc && node --enable-source-maps dist/index.js\"",
     "build": "npx tsc",
     "start": "npx tsc && nodemon --exec node dist/index.js",
-    "create-plugin": "node scripts/create-plugin.js"
+    "create-plugin": "node scripts/create-plugin.js",
+    "install-dependencies": "node scripts/install-dependencies.js"
   },
   "author": "unify-z <i@itify.top>",
   "license": "ISC",
