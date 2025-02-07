@@ -4,6 +4,7 @@ import { Message, MessageSegment } from "./messages.js";
 import  config  from "./config.js";
 import { PrivateMessageEvent } from './events.js';
 import logger from './log.js';
+import counter from './counter.js';
 async function call_api(path: string, body: object) {
     const res = await axios.post(`${config.get('onebot.url')}${path}`, body);
     return res.data;
@@ -91,13 +92,16 @@ export class Bot {
             const regex = new RegExp(`^${prefix}${command}`);
             if (regex.test(event.raw_message)) {
                 const args = event.raw_message.split(" ").slice(1);
+                setImmediate(async() => {
+                    await counter.add_user(event.sender.user_id)
+                  });
                 try{
                 await callback(args,handler,reply_msg,event);
                 return
                 }
                 catch(e){
                     logger.error(`error when handling command ${command}, ${e}`)
-                    await this.handleError(e, event);
+                    //await this.handleError(e, event);
                     return;                }
             }
         };
@@ -118,7 +122,7 @@ export class Bot {
                     .then(() => resolve())
                     .catch(async (error) => {
                         console.error(`Error in handler for event ${eventName}:`, error);
-                        await this.handleError(error, event);
+                        //await this.handleError(error, event);
                         return;
                     });
             } else {
