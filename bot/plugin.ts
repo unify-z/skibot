@@ -46,4 +46,10 @@ export class Plugin {
             }}
 
     }
+    get_load_plugins():number{
+        return this.plugins.length
+    }
 }
+
+const plugin = new Plugin('./plugins')
+export default plugin

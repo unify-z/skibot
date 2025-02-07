@@ -13,3 +13,4 @@ config/config.yml
 plugins/*/
 plugins/*.*
 .idea/
+data/*.*

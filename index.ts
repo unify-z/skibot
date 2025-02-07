@@ -1,32 +1,39 @@
 import express from 'express';
-import routers from './routers/message.js'; 
+import msgrouters from './routers/message.js'; 
 import { Bot,Handler } from './bot/bot.js';
-import { BotEvent, BotMessageEvent } from './bot/events.js';
+import { BotEvent, BotMessageEvent, GroupMessageEvent } from './bot/events.js';
 import  config  from './bot/config.js';
 import logger from './bot/log.js'
-import { Plugin } from './bot/plugin.js';
+import plugin, { Plugin } from './bot/plugin.js';
 import { Message,MessageSegment } from './bot/messages.js';
+import schedule from 'node-schedule';
 const app = express();
 const port = config.get('web.port');
 const bot = new Bot(config.get('self_id'));
 const host = config.get('web.host');
 import * as fs from 'fs';
+import counter from './bot/counter.js';
+import { database} from './bot/counter.js';
+import ApiRoutes from './routers/api.js';
 const version = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
 function initialize(){
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
-  app.use('/api', routers); 
+  app.use('/api',ApiRoutes)
+  app.use('/message', msgrouters); 
 
   app.listen(port, host,() => {
     logger.info(`Server is running on http://${host}:${port}`);
   });
-  const plugin = new Plugin('./plugins')
   plugin.load_plugins()
 
 
   bot.on('message', async (event: BotMessageEvent) => {
     logger.info(JSON.stringify(event));
+    await counter.add_hits()
+    if (event instanceof GroupMessageEvent){
+      await counter.add_group(event.group_id)
+    }
   });
   
   bot.on('meta_event', (event: BotEvent) => {
@@ -71,6 +78,28 @@ function onStop(signal: string){
   process.exit(0);
 
 }
+function updateCountHistory(){
+  const groups = database.get('groupList').length
+  const users = database.get('userList').length
+  const hits = database.get('hits').length
+  const groupListLengthHistory = database.get('groupListLengthHistory')
+  const userListLengthHistory = database.get('userListLengthHistory')
+  const hitsLengthHistory = database.get('hitsLengthHistory')
+  groupListLengthHistory.push(groups)
+  userListLengthHistory.push(users)
+  hitsLengthHistory.push(hits)
+  database.updateOne('groupListLengthHistory',groupListLengthHistory)
+  database.updateOne('userListLengthHistory',userListLengthHistory)
+  database.updateOne('hitsLengthHistory',hitsLengthHistory)
+}
+function cleanCount(){
+  database.updateOne('groupList',[])
+  database.updateOne('userList',[])
+  database.updateOne('hits',[])
+}
+schedule.scheduleJob('0 0 * * *', updateCountHistory);
+schedule.scheduleJob('0 0 * * *', cleanCount);
 initialize();
+//updateCountHistory()
 process.on("SIGINT", onStop);
 process.on("SIGTERM", onStop);
