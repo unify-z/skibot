@@ -7,7 +7,7 @@ function main(){
         const packages = plugin_json.packages;
         for (const i of packages) {
             console.log(`正在安装插件${file}的依赖${i}`);
-            process.exec(`npm install ${i}`, (error, stdout, stderr) => {
+            process.exec(`npm install ${i} --no-save`, (error, stdout, stderr) => {
                 if (!error) {
                     console.log(`插件${file}的依赖${i}安装成功`);
                 } else {
