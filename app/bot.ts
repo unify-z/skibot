@@ -174,22 +174,20 @@ export class Bot {
 }
 
 export class Handler{
-    private _event: any;
+    private _event: BotEvent;
     private _send: Function;
-    constructor(event: any) {
+    constructor(event: BotEvent) {
         this._event = event;
         this._send = null
     }
     async finish(message: Message){
         if (this._event instanceof GroupMessageEvent){
             this._send = SendMessage.send_group_msg;
-            this._send(this._event.group_id, message);
-            return;
+            return this._send(this._event.group_id, message);
         }
         if (this._event instanceof PrivateMessageEvent){
             this._send = SendMessage.send_private_msg;
-            this._send(this._event.user_id, message);
-            return;
+            return this._send(this._event.user_id, message);
         }
     }
 }
