@@ -14,13 +14,50 @@ import ApiRoutes from './routers/api.js';
 import jwtHelper from './app/JwtHelper.js';
 import cookieParser from 'cookie-parser';
 import AuthRoutes from './routers/auth.js';
+import path from 'path';
 
 const app = express();
 const port = config.get('web.port');
 const bot = new Bot(config.get('self_id'));
 const host = config.get('web.host');
 const version = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
-function initialize(){
+
+
+function check_db() {
+    const dirPath = './data';
+    const filePath = path.join(dirPath, 'count.json');
+
+    try {
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
+        }
+        let shouldInitialize = false;
+        if (fs.existsSync(filePath)) {
+            const fileContent = fs.readFileSync(filePath, 'utf-8');
+            if (fileContent.trim() === '' || fileContent.trim() === '{}') {
+                shouldInitialize = true;
+            }
+        } else {
+            shouldInitialize = true;
+        }
+
+        if (shouldInitialize) {
+            const data = {
+                "groupList": [],
+                "userList": [],
+                "messages": [],
+                "groupListLengthHistory": [],
+                "userListLengthHistory": [],
+                "messagesLengthHistory": []
+            };
+            fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+        } 
+    } catch (error) {
+        console.error(error);
+    }
+}
+async function initialize(){
+  check_db()
   plugin.load_plugins() 
   app.use(cookieParser())
   app.use(express.json());
