@@ -63,6 +63,9 @@ ApiRoutes.get('/plugins/list',async (req,res)=> {
     }
     res.json(json_data)
 })
+ApiRoutes.get('/messages',async (req,res)=>{
+    res.json(database.get('messages'))
+})
 
 ApiRoutes.get('/commands/list',async (req,res)=>{
     res.json(get_bot(config.get('self_id')).commands)
