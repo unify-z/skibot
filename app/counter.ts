@@ -32,9 +32,6 @@ class Counter{
             get_messages.push(JSON.stringify(event))
             this._db.updateOne('messages',get_messages)
             return
-        }else{
-            this._db.set('messages',[Date.now()])
-            return
         }
     }
 }

@@ -23,7 +23,7 @@ const host = config.get('web.host');
 const version = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
 
 
-function check_db() {
+async function check_db() {
     const dirPath = './data';
     const filePath = path.join(dirPath, 'count.json');
 
@@ -57,7 +57,8 @@ function check_db() {
     }
 }
 async function initialize(){
-  check_db()
+  await check_db()
+  database.load_data()
   plugin.load_plugins() 
   app.use(cookieParser())
   app.use(express.json());

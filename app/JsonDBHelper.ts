@@ -43,7 +43,7 @@ class Database {
         return this._db.hasOwnProperty(key);
     }
 
-    private load_data(): void {
+    load_data(): void {
         if (fa.existsSync(this._dbpath)) {
             this._db = JSON.parse(fa.readFileSync(this._dbpath).toString());
             this._cache.clear();
