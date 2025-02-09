@@ -11,7 +11,10 @@ AuthRoutes.post("/login",(req,res)=>{
         res.cookie('token',jwtHelper.issueToken({
             "username": username,
             "password": password
-        },3600))
+        },86400000),{
+            path: "/",
+            maxAge: 86400000
+        })
     }
     else{
         res.json({

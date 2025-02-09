@@ -27,7 +27,6 @@ export class Plugin {
                   }).outputText;
                 fs.writeFileSync(fileIndexPath.replace('.ts','.js'),result)
                 fileIndexPath = fileIndexPath.replace('.ts','.js')
-                const plugin_main = await import(`../.${fileIndexPath}`);
                 const plugin_json = JSON.parse(fs.readFileSync(plugininfopath, 'utf-8'));
                 const plugin_except_config = plugin_json.config;
                 let plugin_config = config.get(`plugin.${file}`);
@@ -36,6 +35,7 @@ export class Plugin {
                     plugin_config = config.get(`plugin.${file}`,null)
                 }
                 if (plugin_config.enabled === true){
+                    const plugin_main = await import(`../.${fileIndexPath}`);
                     logger.info(`load plugin ${file}`)
                     this.plugins.push(plugin_json.name)
                     plugin_main.init_config(plugin_config)

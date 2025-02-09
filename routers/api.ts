@@ -9,6 +9,13 @@ import jwtHelper from '../app/JwtHelper.js';
 await import ('express-async-errors')
 
 ApiRoutes.use((req,res,next)=>{
+    if (!req.cookies){
+      res.json({
+        code: 403,
+        msg: 'no cookie found'
+      })
+      return;
+    }
     const token = req.cookies['token']
     if (!token){
       res.json({
@@ -63,6 +70,32 @@ ApiRoutes.get('/plugins/list',async (req,res)=> {
     }
     res.json(json_data)
 })
+
+ApiRoutes.post('/plugins/getConfig',async(req,res)=>{
+    try{
+        const plugin_name = req.body.name;
+        const plugin_config = config.get(`plugin.${plugin_name}`)
+        
+        res.json(plugin_config).send()
+    
+      }
+    catch(e){
+        res.status(500).send(e)
+    }
+})
+
+ApiRoutes.post('/plugins/setConfig',async(req,res)=>{
+    try{
+        const plugin_name = req.body.name;
+        const plugin_config = req.body.config;
+        config.set(`plugin.${plugin_name}`,plugin_config)
+        res.send()
+      }
+    catch(e){
+        res.status(500).send(e)
+    }
+})
+
 ApiRoutes.get('/messages',async (req,res)=>{
     res.json(database.get('messages'))
 })

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec \"npx tsc && node --enable-source-maps dist/index.js\"",
     "build": "npx tsc",
+    "build-dashboard": "cd frontend && npm run build",
     "start": "npx tsc && nodemon --exec node dist/index.js",
     "create-plugin": "node scripts/create-plugin.js",
     "install-dependencies": "node scripts/install-dependencies.js"
@@ -17,7 +18,7 @@
     "@tsconfig/node20": "^20.1.4",
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
-    "express": "^4.21.2",
+    "cors": "^2.8.5",
     "express-async-errors": "^3.1.1",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -28,10 +29,15 @@
     "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/connect-timeout": "^0.0.39",
     "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.2",
+    "connect-timeout": "^1.9.0",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.3",
     "nodemon": "^3.1.9"
   },
   "nodemonConfig": {
@@ -45,7 +51,8 @@
     "ext": "ts yml json",
     "ignore": [
       "dist/",
-      "data/"
+      "data/",
+      "frontend"
     ]
   }
 }
